@@ -52,7 +52,8 @@ server.delete('/api/users/:id', (req,res) => {
 })
 
 server.get('/api/users/:id', (req,res) => {
-  Users.findById(req)
+  const id = req.params.id
+  Users.findById(id)
   .then( user => {
     res.status(200).json(user)
   })
