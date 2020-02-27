@@ -39,6 +39,18 @@ server.post('/api/users/', (req,res) => {
   })
 })
 
+server.delete('/api/users/:id', (req,res) => {
+  const id = req.params.id;
+  Users.remove(id)
+  .then( deleted => {
+    res.status(200).json(deleted)
+  })
+  .catch(err=> {
+    console.log(err)
+    res.status(500).json('Sorry there was an error removing the user.')
+  })
+})
+
 server.get('/api/users/:id', (req,res) => {
   Users.findById(req)
   .then( user => {
