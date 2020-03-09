@@ -39,6 +39,7 @@ server.post('/api/users/', (req,res) => {
   })
 })
 
+// Deletes a user 
 server.delete('/api/users/:id', (req,res) => {
   const id = req.params.id;
   Users.remove(id)
@@ -51,10 +52,11 @@ server.delete('/api/users/:id', (req,res) => {
   })
 })
 
+// Get by user ID
 server.get('/api/users/:id', (req,res) => {
   const id = req.params.id
   Users.findById(id)
-  .then( user => {
+  .then(user => {
     res.status(200).json(user)
   })
   .catch(err => {
@@ -64,5 +66,33 @@ server.get('/api/users/:id', (req,res) => {
     })
   })
 })
+
+// Edits a user
+server.put('/api/users/:id', (req,res) => {
+  const id = req.params.id
+  const userData = req.body
+
+  if (!id) {
+    res.status(404).json({
+      errorMessage: 'The user with the specidfied ID does not exist.'
+    })
+  }
+
+  Users.update(id, userData)
+
+  .then(updated => {
+    res.status(200).json(updated)
+  })
+  .catch(err => {
+    console.log(err)
+    res.status(500).json({
+      errorMessage: 'The user information could not be modified.'
+    })
+    res.status(404).json({
+      errorMessage: 'The user with the specidfied ID does not exist.'
+    })
+  })
+}) 
+
 
 server.listen(8000, () => console.log('API running on port 8000'))
