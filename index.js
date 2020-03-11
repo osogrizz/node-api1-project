@@ -29,11 +29,14 @@ server.post('/api/users/', (req,res) => {
   const userData = req.body
   Users.insert(userData)
   .then(user => {
+    if (!userData.body || !userData.name) {
+      res.status(400).json(userData)
+    }
     res.status(201).json(user)
   })
   .catch(err => {
     console.log(err)
-    res.status(500).json({
+    res.status(400).json({
       errorMessage: 'Please provide the name and bio for the user.'
     })
   })
