@@ -19,7 +19,7 @@ server.get('/api/users', (req,res) => {
   .catch(err => {
     console.log(err)
     res.status(500).json({
-       errorMessage: "Sorry there was an problem finding the users." 
+       errorMessage: "The users information could not be retrieved." 
     })
   })
 });
@@ -29,15 +29,15 @@ server.post('/api/users/', (req,res) => {
   const userData = req.body
   Users.insert(userData)
   .then(user => {
-    if (!userData.body || !userData.name) {
-      res.status(400).json(userData)
+    if (!userData.name || !userData.bio) {
+      res.status(400).json({ errorMessage: 'Please provide the name and bio for the user.' })
     }
     res.status(201).json(user)
   })
   .catch(err => {
     console.log(err)
-    res.status(400).json({
-      errorMessage: 'Please provide the name and bio for the user.'
+    res.status(500).json({
+      errorMessage: 'There was an error while saving the user to the database'
     })
   })
 })
@@ -47,11 +47,16 @@ server.delete('/api/users/:id', (req,res) => {
   const id = req.params.id;
   Users.remove(id)
   .then( deleted => {
-    res.status(200).json(deleted)
+    if (deleted) {
+      res.status(204).json(deleted)
+
+    } else {
+      res.status(404).json({success: false}, 'The user with the specified ID does not exist.')
+    }
   })
   .catch(err=> {
     console.log(err)
-    res.status(500).json('Sorry there was an error removing the user.')
+    res.status(500).json({success: false}, 'The user could not be removed')
   })
 })
 
@@ -60,12 +65,15 @@ server.get('/api/users/:id', (req,res) => {
   const id = req.params.id
   Users.findById(id)
   .then(user => {
+    if (!id) {
+      res.status(404).json({srrorMessage: 'The user with the specified ID does not exist.'})
+    }
     res.status(200).json(user)
   })
   .catch(err => {
     console.log(err)
     res.status(500).json({
-      errorMessage: 'Sorry I cannot find that user.'
+      errorMessage: 'The user information could not be retrieved.'
     })
   })
 })
@@ -75,24 +83,25 @@ server.put('/api/users/:id', (req,res) => {
   const id = req.params.id
   const userData = req.body
 
-  if (!id) {
-    res.status(404).json({
-      errorMessage: 'The user with the specidfied ID does not exist.'
-    })
-  }
-
+  
   Users.update(id, userData)
-
+  
+  
   .then(updated => {
+    if (!id) {
+      res.status(404).json({
+        errorMessage: 'The user with the specidfied ID does not exist.'
+      })
+    } 
+    if (!userData.name || !userData.bio) {
+      res.status(400).json({ errorMessage: 'Please provide name and bio for the user.' })
+    }
     res.status(200).json(updated)
   })
   .catch(err => {
     console.log(err)
     res.status(500).json({
       errorMessage: 'The user information could not be modified.'
-    })
-    res.status(404).json({
-      errorMessage: 'The user with the specidfied ID does not exist.'
     })
   })
 }) 
